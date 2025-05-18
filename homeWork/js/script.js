@@ -17,77 +17,104 @@ P.S. Здесь есть несколько вариантов решения з
 
 "use strict";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const filmItems = document.querySelector(".promo__interactive-list");
-document.querySelectorAll(".promo__adv img").forEach((item) => item.remove());
-document.querySelector(".promo__genre").textContent = "ДРАМА";
-document.querySelector(".promo__bg").style.cssText =
-  'background:url("img/bg.jpg") center center/cover no-repeat;';
+  const adv = document.querySelectorAll(".promo__adv img");
+  const gen =  document.querySelector(".promo__genre");
+  const bg = document.querySelector(".promo__bg")
 
-const movieDB = {
-  movies: [
-    "Логан",
-    "Лига справедливости",
-    "Ла-ла лэнд",
-    "Одержимость",
-    "Скотт Пилигрим против...",
-  ],
-};
+  const movieDB = {
+    movies: [
+      "Логан",
+      "Лига справедливости",
+      "Ла-ла лэнд",
+      "Одержимость",
+      "Скотт Пилигрим против...",
+    ],
+  };
 
-function refreshMovieData() {
-  movieDB.movies.sort();
-  filmItems.innerHTML = "";
-  movieDB.movies.forEach((item, i) => {
-    filmItems.insertAdjacentHTML(
-      "beforeend",
-      `<li class="promo__interactive-item">
+  const delAds = (ads) => {
+    ads.forEach((item) => item.remove());
+  }
+  delAds(adv);
+
+  const makeChage = (gener, bgc) => {
+    gener.textContent = 'ДРАМА';
+    bgc.style.cssText = 'background:url("img/bg.jpg") center center/cover no-repeat;';
+
+  }
+
+  makeChage(gen, bg);
+ 
+
+  function refreshMovieData() {
+    movieDB.movies.sort();
+    filmItems.innerHTML = "";
+    movieDB.movies.forEach((item, i) => {
+      filmItems.insertAdjacentHTML(
+        "beforeend",
+        `<li class="promo__interactive-item">
     ${i + 1}.${movieDB.movies[i]}
     <div class="delete"></div>
       </li>`
-    );
-  });
-}
-
-refreshMovieData();
-
-const input = document.querySelector(".adding__input"),
-  aproved = document.querySelector("button");
-
-aproved.addEventListener("click", (e) => {
-  e.preventDefault();
-  let movie = input.value;
-  if (movie.length > 21) {
-    movie = movie.slice(0, 21);
-    movie += "...";
-  }
-  movieDB.movies.push(movie);
-  refreshMovieData();
-});
-
-
-filmItems.addEventListener("click", (e) =>{
-  let current = e.target;
-  
-  if (current.classList.contains("delete")) {
-    movieDB.movies.forEach((film, i) => {
-      let currentFilm = current.parentElement.textContent.replace(`${i + 1}.`, "").replace(/\s+/g, "");
-
-      if (film.replace(/\s+/g, "") == currentFilm) {
-        movieDB.movies.splice(i, 1);
-        console.log(movieDB.movies);
-      }
+      );
     });
-    current.parentElement.remove();
-    refreshMovieData();
   }
-});
+
+  refreshMovieData();
+
+  const input = document.querySelector(".adding__input");
+  const aproved = document.querySelector("button");
+  const chekbox = document.querySelector('input[type="checkbox"]');  
+
+  function addFilm(film, data) {
+    let movie = film.value;
+    movie = movie.trim()
+
+    if(movie) {
+
+      if (movie.length > 21) {
+        movie = `${movie.substring(0, 22)}...`
+      }
+
+      data.push(movie);
+      refreshMovieData();
+    }
 
 
-const chekbox = document.querySelector('input[type="checkbox"]');
-chekbox.addEventListener("click", (e) => {
-  if (chekbox.checked) {
-    console.log("Добавляем любимый фильм");
+
   }
-});
 
-})
+  aproved.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    if(chekbox.checked) {
+      addFilm(input, movieDB.movies);
+      console.log("Добавляем любимый фильм");
+    } else {
+      addFilm(input, movieDB.movies);
+    }
+    
+  });
+
+  filmItems.addEventListener("click", (e) => {
+    let current = e.target;
+
+    if (current.classList.contains("delete")) {
+      movieDB.movies.forEach((film, i) => {
+        let currentFilm = current.parentElement.textContent
+          .replace(`${i + 1}.`, "")
+          .replace(/\s+/g, "");
+
+        if (film.replace(/\s+/g, "") == currentFilm) {
+          movieDB.movies.splice(i, 1);
+          console.log(movieDB.movies);
+        }
+      });
+      current.parentElement.remove();
+      refreshMovieData();
+    }
+  });
+
+
+});
